@@ -40,9 +40,9 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     let table = Table::new(rows)
         .header(header_row())
         .widths(&[
-            Constraint::Percentage(40),
-            Constraint::Percentage(30),
-            Constraint::Percentage(30),
+            Constraint::Percentage(50),
+            Constraint::Percentage(25),
+            Constraint::Percentage(25),
         ])
         .style(Style::default().fg(Color::White))
         .column_spacing(1)
