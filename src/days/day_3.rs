@@ -1,6 +1,13 @@
-use std::collections::HashSet;
+use itertools::Itertools;
+use std::collections::HashMap;
 
 // PART 1
+
+struct Sack<'a> {
+    contents: &'a str,
+    compartment_1: Option<&'a str>,
+    compartment_2: Option<&'a str>,
+}
 
 fn split_line(line: &str) -> Option<(&str, &str)> {
     let len = line.len();
@@ -13,19 +20,49 @@ fn split_line(line: &str) -> Option<(&str, &str)> {
     }
 }
 
-fn parse_input(input: &str) -> Vec<(&str, &str)> {
-    return input.lines().filter_map(split_line).collect();
+impl<'a> Sack<'a> {
+    fn new(contents: &str) -> Sack {
+        let compartments = split_line(contents);
+
+        Sack {
+            contents,
+            compartment_1: compartments.and_then(|c| Some(c.0)),
+            compartment_2: compartments.and_then(|c| Some(c.1)),
+        }
+    }
 }
 
-fn find_duplicate(sack: (&str, &str)) -> Option<char> {
-    let compartment_1: HashSet<char> = HashSet::from_iter(sack.0.chars());
-    let compartment_2: HashSet<char> = HashSet::from_iter(sack.1.chars());
+fn parse_input(input: &str) -> Vec<Sack> {
+    return input
+        .lines()
+        .filter(|l| !l.is_empty())
+        .map(|l| Sack::new(l))
+        .collect();
+}
 
-    let dupe = compartment_1
-        .intersection(&compartment_2)
-        .next()?;
+fn first_common_char(strings: Vec<&str>) -> Option<char> {
+    let string_count = strings.len();
+    let mut char_counts: HashMap<char, usize> = HashMap::new();
 
-    return Some(*dupe);
+    for s in strings.iter() {
+        for c in s.chars().unique() {
+            let mut count = *char_counts.get(&c).unwrap_or(&0);
+            count += 1;
+
+            if count == string_count {
+                return Some(c);
+            } else {
+                char_counts.insert(c, count);
+            }
+        }
+    }
+
+    return None;
+}
+
+fn find_duplicate_item(sack: &Sack) -> Option<char> {
+    let strings = vec![sack.compartment_1?, sack.compartment_2?];
+    return first_common_char(strings);
 }
 
 fn priority(item: char) -> u32 {
@@ -43,7 +80,7 @@ pub fn solve_1(input: &str) -> String {
 
     let dupe_priority_sum: u32 = sacks
         .iter()
-        .filter_map(|sack| find_duplicate(*sack))
+        .filter_map(|sack| find_duplicate_item(sack))
         .map(|dupe| priority(dupe))
         .sum();
 
@@ -52,8 +89,29 @@ pub fn solve_1(input: &str) -> String {
 
 // PART 2
 
+fn find_badge(group: &Vec<Sack>) -> Option<char> {
+    let strings = group.iter().map(|sack| sack.contents).collect();
+
+    return first_common_char(strings);
+}
+
 pub fn solve_2(input: &str) -> String {
-    return "NA".to_string();
+    let sacks = parse_input(input);
+
+    let sack_groups: Vec<Vec<Sack>> = sacks
+        .into_iter()
+        .chunks(3)
+        .into_iter()
+        .map(|group| group.collect())
+        .collect();
+
+    let badge_priority_sum: u32 = sack_groups
+        .iter()
+        .filter_map(|group| find_badge(group))
+        .map(|badge| priority(badge))
+        .sum();
+
+    return badge_priority_sum.to_string();
 }
 
 #[cfg(test)]
@@ -75,9 +133,9 @@ CrZsJsPPZsGzwwsLwLmpwMDw
         assert_eq!(result, "157");
     }
 
-    // #[test]
-    // fn solve_2_correct() {
-    //     let result = solve_2(TEST_INPUT);
-    //     assert_eq!(result, "12");
-    // }
+    #[test]
+    fn solve_2_correct() {
+        let result = solve_2(TEST_INPUT);
+        assert_eq!(result, "70");
+    }
 }
