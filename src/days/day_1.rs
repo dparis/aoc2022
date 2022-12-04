@@ -1,5 +1,7 @@
 use itertools::Itertools;
 
+// PART 1
+
 fn sum_lines(lines: Vec<&str>) -> u32 {
     return lines
         .iter()
@@ -29,6 +31,8 @@ pub fn solve_1(input: &str) -> String {
     let sums = sorted_sums(input);
     return sums.last().unwrap_or(&0).to_string();
 }
+
+// PART 2
 
 pub fn solve_2(input: &str) -> String {
     let sums = sorted_sums(input);
