@@ -109,7 +109,7 @@ pub fn init_days() -> Vec<Day> {
             String::from("Rucksack Reorganization"),
             Some(day_3::solve_1),
             Some(day_3::solve_2),
-            Correct::None,
+            Correct::PartOne,
         ),
         Day::new(
             4,
