@@ -1,5 +1,6 @@
 use crate::days::{init_days, Day};
 
+use std::process::Command;
 use tui::widgets::TableState;
 
 pub struct StatefulTable<T> {
@@ -42,6 +43,11 @@ impl<T> StatefulTable<T> {
         };
         self.state.select(Some(i));
     }
+
+    pub fn current_item(&self) -> &T {
+        let i = self.state.selected().unwrap_or(0);
+        return &self.items[i];
+    }
 }
 
 pub struct App<'a> {
@@ -73,6 +79,15 @@ impl<'a> App<'a> {
         match c {
             'q' => {
                 self.should_quit = true;
+            }
+
+            'o' => {
+                let item = self.day_table.current_item();
+
+                Command::new("open")
+                    .arg(item.url())
+                    .output()
+                    .expect("FAILED TO OPEN");
             }
 
             _ => {}
