@@ -1,10 +1,10 @@
-use crate::days::{Day, init_days};
+use crate::days::{init_days, Day};
 
-use tui::widgets::{TableState};
+use tui::widgets::TableState;
 
 pub struct StatefulTable<T> {
     pub state: TableState,
-    pub items: Vec<T>
+    pub items: Vec<T>,
 }
 
 impl<T> StatefulTable<T> {
@@ -69,14 +69,6 @@ impl<'a> App<'a> {
         self.day_table.next();
     }
 
-    pub fn on_right(&mut self) {
-        // self.tabs.next();
-    }
-
-    pub fn on_left(&mut self) {
-        // self.tabs.previous();
-    }
-
     pub fn on_key(&mut self, c: char) {
         match c {
             'q' => {
@@ -87,6 +79,5 @@ impl<'a> App<'a> {
         }
     }
 
-    pub fn on_tick(&mut self) {
-    }
+    pub fn on_tick(&mut self) {}
 }

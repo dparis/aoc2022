@@ -4,13 +4,13 @@ use crate::days::Day;
 use tui::{
     backend::Backend,
     layout::{Constraint, Direction, Layout},
-    style::{Color, Style, Modifier},
+    style::{Color, Modifier, Style},
     widgets::{Block, Borders, Row, Table},
     Frame,
 };
 
 fn header_row<'a>() -> Row<'a> {
-    return Row::new(vec!["Day", "Part 1", "Part 2"])
+    return Row::new(vec!["Day", "Part 1", "Part 2", "Stars"])
         .style(Style::default().add_modifier(Modifier::BOLD));
 }
 
@@ -18,7 +18,7 @@ fn day_to_row<'a>(day: &mut Day) -> Row<'a> {
     let solution_1 = day.part_1.solve().unwrap_or("").to_string();
     let solution_2 = day.part_2.solve().unwrap_or("").to_string();
 
-    return Row::new(vec![day.label(), solution_1, solution_2]);
+    return Row::new(vec![day.label(), solution_1, solution_2, day.stars()]);
 }
 
 fn table_rows<'a>(app: &mut App) -> Vec<Row<'a>> {
@@ -41,8 +41,9 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, app: &mut App) {
         .header(header_row())
         .widths(&[
             Constraint::Percentage(50),
-            Constraint::Percentage(25),
-            Constraint::Percentage(25),
+            Constraint::Percentage(20),
+            Constraint::Percentage(20),
+            Constraint::Percentage(10),
         ])
         .style(Style::default().fg(Color::White))
         .column_spacing(1)
@@ -55,4 +56,3 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, app: &mut App) {
 pub fn draw<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     draw_table(f, app);
 }
-

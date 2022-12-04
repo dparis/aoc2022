@@ -11,7 +11,7 @@ type SolverFn = fn(&str) -> String;
 pub struct Problem {
     path: String,
     solver: Option<SolverFn>,
-    solution: OnceCell<String>
+    solution: OnceCell<String>,
 }
 
 impl Problem {
@@ -31,7 +31,7 @@ impl Problem {
 pub enum Correct {
     None,
     PartOne,
-    Both
+    Both,
 }
 
 pub struct Day {
@@ -52,7 +52,7 @@ impl Day {
         title: String,
         first_solver: Option<SolverFn>,
         second_solver: Option<SolverFn>,
-        correct: Correct
+        correct: Correct,
     ) -> Self {
         Self {
             advent_day,
@@ -78,6 +78,14 @@ impl Day {
     pub fn url(&self) -> String {
         return format!("https://adventofcode.com/2022/day/{}", self.advent_day);
     }
+
+    pub fn stars(&self) -> String {
+        return match self.correct {
+            Correct::None => String::from(""),
+            Correct::PartOne => String::from("*"),
+            Correct::Both => String::from("**"),
+        };
+    }
 }
 
 pub fn init_days() -> Vec<Day> {
@@ -89,7 +97,6 @@ pub fn init_days() -> Vec<Day> {
             Some(day_1::solve_2),
             Correct::Both,
         ),
-
         Day::new(
             2,
             String::from("Rock Paper Scissors"),
@@ -97,7 +104,6 @@ pub fn init_days() -> Vec<Day> {
             Some(day_2::solve_2),
             Correct::Both,
         ),
-
         Day::new(
             3,
             String::from("Rucksack Reorganization"),
@@ -105,7 +111,6 @@ pub fn init_days() -> Vec<Day> {
             Some(day_3::solve_2),
             Correct::None,
         ),
-
         Day::new(
             4,
             String::from("Camp Cleanup"),
