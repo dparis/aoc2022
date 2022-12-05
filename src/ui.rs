@@ -15,8 +15,8 @@ fn header_row<'a>() -> Row<'a> {
 }
 
 fn day_to_row<'a>(day: &mut Day) -> Row<'a> {
-    let solution_1 = day.part_1.solve().unwrap_or("").to_string();
-    let solution_2 = day.part_2.solve().unwrap_or("").to_string();
+    let solution_1 = day.part_1.solution().unwrap_or(String::from(""));
+    let solution_2 = day.part_2.solution().unwrap_or(String::from(""));
 
     return Row::new(vec![day.label(), solution_1, solution_2, day.stars()]);
 }

@@ -19,12 +19,16 @@ impl Problem {
         return fs::read_to_string(&self.path).ok();
     }
 
-    pub fn solve(&self) -> Option<&str> {
-        let solver = self.solver?;
-        let input = self.read_input()?;
+    pub fn solve(&self) {
+        if let Some(solver) = self.solver {
+            if let Some(input) = self.read_input() {
+                self.solution.set(solver(&input));
+            }
+        }
+    }
 
-        let solution = self.solution.get_or_init(|| solver(&input));
-        return Some(solution);
+    pub fn solution(&self) -> Option<String> {
+        return self.solution.get().map(|s| s.to_string());
     }
 }
 

@@ -90,6 +90,12 @@ impl<'a> App<'a> {
                     .expect("FAILED TO OPEN");
             }
 
+            's' => {
+                let item = self.day_table.current_item();
+                item.part_1.solve();
+                item.part_2.solve();
+            }
+
             _ => {}
         }
     }
