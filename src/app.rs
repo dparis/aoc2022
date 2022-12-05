@@ -96,6 +96,12 @@ impl<'a> App<'a> {
                 item.part_2.solve();
             }
 
+            'S' => {
+                for item in &self.day_table.items {
+                    item.part_1.solve();
+                    item.part_2.solve();
+                }
+            }
             _ => {}
         }
     }
