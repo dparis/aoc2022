@@ -22,9 +22,11 @@ impl Problem {
     pub fn solve(&self) {
         if let Some(solver) = self.solver {
             if let Some(input) = self.read_input() {
-                self.solution
-                    .set(solver(&input))
-                    .expect("Tried to double-set solution");
+                if let None = self.solution.get() {
+                    self.solution
+                        .set(solver(&input))
+                        .expect("Tried to double-set solution");
+                }
             }
         }
     }
