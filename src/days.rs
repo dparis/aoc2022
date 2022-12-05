@@ -2,6 +2,7 @@ mod day_1;
 mod day_2;
 mod day_3;
 mod day_4;
+mod day_5;
 
 use once_cell::unsync::OnceCell;
 use std::fs;
@@ -125,6 +126,13 @@ pub fn init_days() -> Vec<Day> {
             Some(day_4::solve_1),
             Some(day_4::solve_2),
             Correct::Both,
+        ),
+        Day::new(
+            5,
+            String::from("Supply Stacks"),
+            Some(day_5::solve_1),
+            Some(day_5::solve_2),
+            Correct::None,
         ),
     ];
 }
