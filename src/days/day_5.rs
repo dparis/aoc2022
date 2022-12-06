@@ -1,7 +1,190 @@
 // PART 1
 
+use itertools::Itertools;
+use regex::Regex;
+use std::collections::HashMap;
+
+#[derive(Debug)]
+struct Crate {
+    label: String,
+}
+
+type StackId = u32;
+
+#[derive(Debug)]
+struct SupplyStack {
+    id: StackId,
+    stack: Vec<Crate>,
+}
+
+#[derive(Clone, Debug)]
+struct Instruction {
+    amount: u32,
+    src: StackId,
+    dest: StackId,
+}
+
+#[derive(Debug)]
+struct CargoManifest {
+    stacks: HashMap<StackId, SupplyStack>,
+    instructions: Vec<Instruction>,
+}
+
+#[derive(Debug)]
+enum InstructionError {
+    SrcNotFound(Instruction),
+    DestNotFound(Instruction),
+    InvalidAmount(Instruction),
+}
+
+type InstructionResult = std::result::Result<(), InstructionError>;
+
+impl CargoManifest {
+    fn apply_instructions(&mut self) -> InstructionResult {
+        for inst in self.instructions.iter() {
+            let amount = inst.amount;
+            let mut src = self
+                .stacks
+                .remove(&inst.src)
+                .ok_or(InstructionError::SrcNotFound(inst.clone()))?;
+            let mut dest = self
+                .stacks
+                .remove(&inst.dest)
+                .ok_or(InstructionError::DestNotFound(inst.clone()))?;
+
+            for _ in 0..amount {
+                let c = src
+                    .stack
+                    .pop()
+                    .ok_or(InstructionError::InvalidAmount(inst.clone()))?;
+                dest.stack.push(c);
+            }
+
+            self.stacks.insert(src.id, src);
+            self.stacks.insert(dest.id, dest);
+        }
+
+        return Ok(());
+    }
+
+    fn current_tops(&self) -> Vec<Option<&Crate>> {
+        return self
+            .stacks
+            .values()
+            .sorted_by_key(|s| s.id)
+            .map(|s| s.stack.last())
+            .collect();
+    }
+}
+
+fn parse_stacks(lines: &Vec<&str>) -> Option<HashMap<StackId, SupplyStack>> {
+    let stack_ids = lines.last()?;
+    let id_indexes: Vec<usize> = stack_ids
+        .chars()
+        .enumerate()
+        .filter_map(|(i, c)| {
+            if c.is_whitespace() {
+                return None;
+            } else {
+                return Some(i);
+            }
+        })
+        .collect();
+
+    let mut stacks: HashMap<StackId, SupplyStack> = HashMap::new();
+
+    for (id, idx) in id_indexes.iter().enumerate() {
+        let stack_id = id as u32 + 1;
+
+        let stack: Vec<Crate> = lines
+            .iter()
+            .rev()
+            .skip(1)
+            .filter_map(|line| match line.chars().nth(*idx) {
+                Some(label) if label.is_alphanumeric() => Some(Crate {
+                    label: label.to_string(),
+                }),
+                Some(_) => None,
+                None => None,
+            })
+            .collect();
+
+        let supply_stack = SupplyStack {
+            id: stack_id,
+            stack,
+        };
+
+        stacks.insert(stack_id, supply_stack);
+    }
+
+    return Some(stacks);
+}
+
+fn parse_instructions(lines: Vec<&str>) -> Option<Vec<Instruction>> {
+    let r = Regex::new(r"^move (\d+) from (\d+) to (\d+)$").expect("Invalid regex");
+
+    let instructions = lines
+        .iter()
+        .filter_map(|line| r.captures(line))
+        .filter_map(|capture| {
+            let amount = capture.get(1)?.as_str().parse().ok()?;
+            let src = capture.get(2)?.as_str().parse().ok()?;
+            let dest = capture.get(3)?.as_str().parse().ok()?;
+
+            Some(Instruction { amount, src, dest })
+        })
+        .collect();
+
+    return Some(instructions);
+}
+
+fn parse_input(input: &str) -> Option<CargoManifest> {
+    let stack_diagram_lines: Vec<&str> = input
+        .lines()
+        .skip_while(|l| l.is_empty())
+        .take_while(|l| !l.is_empty())
+        .collect();
+
+    let stacks = parse_stacks(&stack_diagram_lines)?;
+
+    let instruction_lines: Vec<&str> = input
+        .lines()
+        .skip_while(|l| l.is_empty())
+        .skip_while(|l| !l.is_empty())
+        .skip(1)
+        .collect();
+
+    let instructions = parse_instructions(instruction_lines)?;
+
+    let cm = CargoManifest {
+        stacks,
+        instructions,
+    };
+
+    return Some(cm);
+}
+
 pub fn solve_1(input: &str) -> String {
-    return "NA".to_string();
+    let mut cargo_manifest = parse_input(&input).expect("Invalid input");
+
+    if let Err(e) = cargo_manifest.apply_instructions() {
+        eprintln!("error applying instructions: {:?} {:?}", e, cargo_manifest);
+        return String::from("ERROR");
+    }
+
+    let tops: Vec<&String> = cargo_manifest
+        .current_tops()
+        .iter()
+        .filter_map(|crate_opt| {
+            if let Some(c) = crate_opt {
+                Some(&c.label)
+            } else {
+                None
+            }
+        })
+        .collect();
+
+    return tops.iter().join("");
 }
 
 // PART 2
