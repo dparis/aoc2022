@@ -40,7 +40,7 @@ enum InstructionError {
 type InstructionResult = std::result::Result<(), InstructionError>;
 
 impl CargoManifest {
-    fn apply_instructions(&mut self) -> InstructionResult {
+    fn apply_instructions_part_1(&mut self) -> InstructionResult {
         for inst in self.instructions.iter() {
             let amount = inst.amount;
             let mut src = self
@@ -59,6 +59,33 @@ impl CargoManifest {
                     .ok_or(InstructionError::InvalidAmount(inst.clone()))?;
                 dest.stack.push(c);
             }
+
+            self.stacks.insert(src.id, src);
+            self.stacks.insert(dest.id, dest);
+        }
+
+        return Ok(());
+    }
+
+    fn apply_instructions_part_2(&mut self) -> InstructionResult {
+        for inst in self.instructions.iter() {
+            let amount = inst.amount;
+            let mut src = self
+                .stacks
+                .remove(&inst.src)
+                .ok_or(InstructionError::SrcNotFound(inst.clone()))?;
+            let mut dest = self
+                .stacks
+                .remove(&inst.dest)
+                .ok_or(InstructionError::DestNotFound(inst.clone()))?;
+
+            let split_at = src.stack
+                .len()
+                .checked_sub(amount as usize)
+                .ok_or(InstructionError::InvalidAmount(inst.clone()))?;
+
+            let mut load = src.stack.split_off(split_at);
+            dest.stack.append(&mut load);
 
             self.stacks.insert(src.id, src);
             self.stacks.insert(dest.id, dest);
@@ -167,7 +194,7 @@ fn parse_input(input: &str) -> Option<CargoManifest> {
 pub fn solve_1(input: &str) -> String {
     let mut cargo_manifest = parse_input(&input).expect("Invalid input");
 
-    if let Err(e) = cargo_manifest.apply_instructions() {
+    if let Err(e) = cargo_manifest.apply_instructions_part_1() {
         eprintln!("error applying instructions: {:?} {:?}", e, cargo_manifest);
         return String::from("ERROR");
     }
@@ -190,7 +217,26 @@ pub fn solve_1(input: &str) -> String {
 // PART 2
 
 pub fn solve_2(input: &str) -> String {
-    return "NA".to_string();
+    let mut cargo_manifest = parse_input(&input).expect("Invalid input");
+
+    if let Err(e) = cargo_manifest.apply_instructions_part_2() {
+        eprintln!("error applying instructions: {:?} {:?}", e, cargo_manifest);
+        return String::from("ERROR");
+    }
+
+    let tops: Vec<&String> = cargo_manifest
+        .current_tops()
+        .iter()
+        .filter_map(|crate_opt| {
+            if let Some(c) = crate_opt {
+                Some(&c.label)
+            } else {
+                None
+            }
+        })
+        .collect();
+
+    return tops.iter().join("");
 }
 
 #[cfg(test)]
@@ -215,9 +261,9 @@ move 1 from 1 to 2
         assert_eq!(result, "CMZ");
     }
 
-    // #[test]
-    // fn solve_2_correct() {
-    //     let result = solve_2(TEST_INPUT);
-    //     assert_eq!(result, "4");
-    // }
+    #[test]
+    fn solve_2_correct() {
+        let result = solve_2(TEST_INPUT);
+        assert_eq!(result, "MCD");
+    }
 }

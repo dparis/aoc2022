@@ -132,7 +132,7 @@ pub fn init_days() -> Vec<Day> {
             String::from("Supply Stacks"),
             Some(day_5::solve_1),
             Some(day_5::solve_2),
-            Correct::PartOne,
+            Correct::Both,
         ),
     ];
 }
