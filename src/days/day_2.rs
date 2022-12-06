@@ -6,7 +6,7 @@ fn parse_input(input: &str) -> Vec<(&str, &str)> {
     return input
         .lines()
         .filter_map(|line| line.split(' ').collect_tuple())
-        .collect()
+        .collect();
 }
 
 #[derive(Debug)]
@@ -95,7 +95,7 @@ pub fn solve_1(input: &str) -> String {
 enum OutcomeInstruction {
     Win,
     Lose,
-    Draw
+    Draw,
 }
 
 fn outcome_instruction(outcome_code: &str) -> Option<OutcomeInstruction> {
@@ -103,7 +103,7 @@ fn outcome_instruction(outcome_code: &str) -> Option<OutcomeInstruction> {
         "X" => Some(OutcomeInstruction::Lose),
         "Y" => Some(OutcomeInstruction::Draw),
         "Z" => Some(OutcomeInstruction::Win),
-        _ => None
+        _ => None,
     }
 }
 
