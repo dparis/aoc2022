@@ -137,7 +137,7 @@ pub fn init_days() -> Vec<Day> {
         ),
         Day::new(
             6,
-            String::from("NA"),
+            String::from("Tuning Trouble"),
             Some(day_6::solve_1),
             Some(day_6::solve_2),
             Correct::Both,
