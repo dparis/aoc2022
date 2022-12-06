@@ -11,8 +11,8 @@ fn sum_lines(lines: Vec<&str>) -> u32 {
 
 fn sorted_sums(input: &str) -> Vec<u32> {
     let mut groups: Vec<Vec<&str>> = Vec::new();
-    for (key, group) in &input.lines().group_by(|l| *l != "") {
-        if key == true {
+    for (key, group) in &input.lines().group_by(|l| !l.is_empty()) {
+        if key {
             groups.push(group.collect());
         }
     }
@@ -23,8 +23,7 @@ fn sorted_sums(input: &str) -> Vec<u32> {
         .collect();
 
     sums.sort();
-
-    return sums;
+    sums
 }
 
 pub fn solve_1(input: &str) -> String {
@@ -38,7 +37,7 @@ pub fn solve_2(input: &str) -> String {
     let sums = sorted_sums(input);
     let total: u32 = sums.iter().rev().take(3).sum();
 
-    return total.to_string();
+    total.to_string()
 }
 
 #[cfg(test)]

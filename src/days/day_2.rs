@@ -5,7 +5,7 @@ use itertools::Itertools;
 fn parse_input(input: &str) -> Vec<(&str, &str)> {
     return input
         .lines()
-        .filter_map(|line| line.split(" ").collect_tuple())
+        .filter_map(|line| line.split(' ').collect_tuple())
         .collect()
 }
 
@@ -17,21 +17,21 @@ enum Throw {
 }
 
 fn challenger_throw(code: &str) -> Option<Throw> {
-    return match code {
+    match code {
         "A" => Some(Throw::Rock),
         "B" => Some(Throw::Paper),
         "C" => Some(Throw::Scissors),
         _ => None,
-    };
+    }
 }
 
 fn player_throw(code: &str) -> Option<Throw> {
-    return match code {
+    match code {
         "X" => Some(Throw::Rock),
         "Y" => Some(Throw::Paper),
         "Z" => Some(Throw::Scissors),
         _ => None,
-    };
+    }
 }
 
 #[derive(Debug)]
@@ -59,23 +59,23 @@ fn play_round(challenger_code: &str, player_code: &str) -> Option<Outcome> {
         (Throw::Scissors, Throw::Scissors) => Outcome::Draw(Throw::Scissors),
     };
 
-    return Some(result);
+    Some(result)
 }
 
 fn throw_score(throw: Throw) -> u32 {
-    return match throw {
+    match throw {
         Throw::Rock => 1,
         Throw::Paper => 2,
         Throw::Scissors => 3,
-    };
+    }
 }
 
 fn round_score(outcome: Outcome) -> u32 {
-    return match outcome {
+    match outcome {
         Outcome::PlayerWins(throw) => 6 + throw_score(throw),
         Outcome::Draw(throw) => 3 + throw_score(throw),
         Outcome::ChallengerWins(throw) => throw_score(throw),
-    };
+    }
 }
 
 pub fn solve_1(input: &str) -> String {
@@ -84,10 +84,10 @@ pub fn solve_1(input: &str) -> String {
     let score: u32 = plays
         .iter()
         .filter_map(|(cc, pc)| play_round(cc, pc))
-        .map(|outcome| round_score(outcome))
+        .map(round_score)
         .sum();
 
-    return score.to_string();
+    score.to_string()
 }
 
 // PART 2
@@ -99,7 +99,7 @@ enum OutcomeInstruction {
 }
 
 fn outcome_instruction(outcome_code: &str) -> Option<OutcomeInstruction> {
-    return match outcome_code {
+    match outcome_code {
         "X" => Some(OutcomeInstruction::Lose),
         "Y" => Some(OutcomeInstruction::Draw),
         "Z" => Some(OutcomeInstruction::Win),
@@ -125,7 +125,7 @@ fn desired_outcome(challenger_code: &str, outcome_code: &str) -> Option<Outcome>
         (Throw::Scissors, OutcomeInstruction::Draw) => Outcome::Draw(Throw::Scissors),
     };
 
-    return Some(result);
+    Some(result)
 }
 
 pub fn solve_2(input: &str) -> String {
@@ -134,10 +134,10 @@ pub fn solve_2(input: &str) -> String {
     let score: u32 = plays
         .iter()
         .filter_map(|(cc, oc)| desired_outcome(cc, oc))
-        .map(|outcome| round_score(outcome))
+        .map(round_score)
         .sum();
 
-    return score.to_string();
+    score.to_string()
 }
 
 #[cfg(test)]

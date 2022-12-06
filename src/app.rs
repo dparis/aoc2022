@@ -46,7 +46,7 @@ impl<T> StatefulTable<T> {
 
     pub fn current_item(&self) -> &T {
         let i = self.state.selected().unwrap_or(0);
-        return &self.items[i];
+        &self.items[i]
     }
 }
 

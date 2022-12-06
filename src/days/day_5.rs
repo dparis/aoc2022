@@ -43,20 +43,22 @@ impl CargoManifest {
     fn apply_instructions_part_1(&mut self) -> InstructionResult {
         for inst in self.instructions.iter() {
             let amount = inst.amount;
+
             let mut src = self
                 .stacks
                 .remove(&inst.src)
-                .ok_or(InstructionError::SrcNotFound(inst.clone()))?;
+                .ok_or_else(|| InstructionError::SrcNotFound(inst.clone()))?;
+
             let mut dest = self
                 .stacks
                 .remove(&inst.dest)
-                .ok_or(InstructionError::DestNotFound(inst.clone()))?;
+                .ok_or_else(|| InstructionError::DestNotFound(inst.clone()))?;
 
             for _ in 0..amount {
                 let c = src
                     .stack
                     .pop()
-                    .ok_or(InstructionError::InvalidAmount(inst.clone()))?;
+                    .ok_or_else(|| InstructionError::InvalidAmount(inst.clone()))?;
                 dest.stack.push(c);
             }
 
@@ -64,7 +66,7 @@ impl CargoManifest {
             self.stacks.insert(dest.id, dest);
         }
 
-        return Ok(());
+        Ok(())
     }
 
     fn apply_instructions_part_2(&mut self) -> InstructionResult {
@@ -73,16 +75,17 @@ impl CargoManifest {
             let mut src = self
                 .stacks
                 .remove(&inst.src)
-                .ok_or(InstructionError::SrcNotFound(inst.clone()))?;
+                .ok_or_else(|| InstructionError::SrcNotFound(inst.clone()))?;
             let mut dest = self
                 .stacks
                 .remove(&inst.dest)
-                .ok_or(InstructionError::DestNotFound(inst.clone()))?;
+                .ok_or_else(|| InstructionError::DestNotFound(inst.clone()))?;
 
-            let split_at = src.stack
+            let split_at = src
+                .stack
                 .len()
                 .checked_sub(amount as usize)
-                .ok_or(InstructionError::InvalidAmount(inst.clone()))?;
+                .ok_or_else(|| InstructionError::InvalidAmount(inst.clone()))?;
 
             let mut load = src.stack.split_off(split_at);
             dest.stack.append(&mut load);
@@ -91,7 +94,7 @@ impl CargoManifest {
             self.stacks.insert(dest.id, dest);
         }
 
-        return Ok(());
+        Ok(())
     }
 
     fn current_tops(&self) -> Vec<Option<&Crate>> {
@@ -104,18 +107,12 @@ impl CargoManifest {
     }
 }
 
-fn parse_stacks(lines: &Vec<&str>) -> Option<HashMap<StackId, SupplyStack>> {
+fn parse_stacks(lines: &[&str]) -> Option<HashMap<StackId, SupplyStack>> {
     let stack_ids = lines.last()?;
     let id_indexes: Vec<usize> = stack_ids
         .chars()
         .enumerate()
-        .filter_map(|(i, c)| {
-            if c.is_whitespace() {
-                return None;
-            } else {
-                return Some(i);
-            }
-        })
+        .filter_map(|(i, c)| if c.is_whitespace() { None } else { Some(i) })
         .collect();
 
     let mut stacks: HashMap<StackId, SupplyStack> = HashMap::new();
@@ -144,7 +141,7 @@ fn parse_stacks(lines: &Vec<&str>) -> Option<HashMap<StackId, SupplyStack>> {
         stacks.insert(stack_id, supply_stack);
     }
 
-    return Some(stacks);
+    Some(stacks)
 }
 
 fn parse_instructions(lines: Vec<&str>) -> Option<Vec<Instruction>> {
@@ -162,7 +159,7 @@ fn parse_instructions(lines: Vec<&str>) -> Option<Vec<Instruction>> {
         })
         .collect();
 
-    return Some(instructions);
+    Some(instructions)
 }
 
 fn parse_input(input: &str) -> Option<CargoManifest> {
@@ -188,11 +185,11 @@ fn parse_input(input: &str) -> Option<CargoManifest> {
         instructions,
     };
 
-    return Some(cm);
+    Some(cm)
 }
 
 pub fn solve_1(input: &str) -> String {
-    let mut cargo_manifest = parse_input(&input).expect("Invalid input");
+    let mut cargo_manifest = parse_input(input).expect("Invalid input");
 
     if let Err(e) = cargo_manifest.apply_instructions_part_1() {
         eprintln!("error applying instructions: {:?} {:?}", e, cargo_manifest);
@@ -202,13 +199,7 @@ pub fn solve_1(input: &str) -> String {
     let tops: Vec<&String> = cargo_manifest
         .current_tops()
         .iter()
-        .filter_map(|crate_opt| {
-            if let Some(c) = crate_opt {
-                Some(&c.label)
-            } else {
-                None
-            }
-        })
+        .filter_map(|crate_opt| crate_opt.as_ref().map(|c| &c.label))
         .collect();
 
     return tops.iter().join("");
@@ -217,7 +208,7 @@ pub fn solve_1(input: &str) -> String {
 // PART 2
 
 pub fn solve_2(input: &str) -> String {
-    let mut cargo_manifest = parse_input(&input).expect("Invalid input");
+    let mut cargo_manifest = parse_input(input).expect("Invalid input");
 
     if let Err(e) = cargo_manifest.apply_instructions_part_2() {
         eprintln!("error applying instructions: {:?} {:?}", e, cargo_manifest);
@@ -227,13 +218,7 @@ pub fn solve_2(input: &str) -> String {
     let tops: Vec<&String> = cargo_manifest
         .current_tops()
         .iter()
-        .filter_map(|crate_opt| {
-            if let Some(c) = crate_opt {
-                Some(&c.label)
-            } else {
-                None
-            }
-        })
+        .filter_map(|crate_opt| crate_opt.as_ref().map(|c| &c.label))
         .collect();
 
     return tops.iter().join("");

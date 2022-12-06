@@ -1,13 +1,13 @@
 // PART 1
 
 pub fn solve_1(_input: &str) -> String {
-    return "".to_string();
+    "".to_string()
 }
 
 // PART 2
 
 pub fn solve_2(_input: &str) -> String {
-    return "".to_string();
+    "".to_string()
 }
 
 #[cfg(test)]

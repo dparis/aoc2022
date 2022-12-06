@@ -4,24 +4,18 @@ use itertools::Itertools;
 
 struct Assignment {
     min: u32,
-    max: u32
+    max: u32,
 }
 
 impl Assignment {
     fn contains(&self, other: &Assignment) -> bool {
-        return self.min <= other.min && self.max >= other.max;
+        self.min <= other.min && self.max >= other.max
     }
 
     fn overlaps(&self, other: &Assignment) -> bool {
-        if self.max >= other.min && self.max <= other.max {
-            return true;
-        } else if self.min >= other.min && self.min <= other.max {
-            return true;
-        } else if self.min <= other.min && self.max >= other.max {
-            return true;
-        } else {
-            return false
-        }
+        self.max >= other.min && self.max <= other.max
+            || self.min >= other.min && self.min <= other.max
+            || self.min <= other.min && self.max >= other.max
     }
 }
 
@@ -40,37 +34,40 @@ fn parse_input_line(line: &str) -> Option<AssignmentPair> {
         .filter_map(|x| x.parse().ok())
         .collect_tuple()?;
 
-    let la = Assignment{min: left_min, max: left_max};
-    let ra = Assignment{min: right_min, max: right_max};
+    let la = Assignment {
+        min: left_min,
+        max: left_max,
+    };
+    let ra = Assignment {
+        min: right_min,
+        max: right_max,
+    };
 
-    return Some((la, ra));
+    Some((la, ra))
 }
 
 fn parse_input(input: &str) -> Vec<AssignmentPair> {
     return input
         .lines()
         .filter(|l| !l.is_empty())
-        .filter_map(|l| parse_input_line(l))
+        .filter_map(parse_input_line)
         .collect();
 }
 
 fn containing_pair(pair: &AssignmentPair) -> bool {
-    return pair.0.contains(&pair.1) || pair.1.contains(&pair.0);
+    pair.0.contains(&pair.1) || pair.1.contains(&pair.0)
 }
 
 fn overlappying_pair(pair: &AssignmentPair) -> bool {
-    return pair.0.overlaps(&pair.1);
+    pair.0.overlaps(&pair.1)
 }
 
 pub fn solve_1(input: &str) -> String {
     let pairs = parse_input(input);
 
-    let containing_pairs = pairs
-        .iter()
-        .filter(|&pair| containing_pair(pair))
-        .count();
+    let containing_pairs = pairs.iter().filter(|&pair| containing_pair(pair)).count();
 
-    return containing_pairs.to_string();
+    containing_pairs.to_string()
 }
 
 // PART 2
@@ -78,12 +75,9 @@ pub fn solve_1(input: &str) -> String {
 pub fn solve_2(input: &str) -> String {
     let pairs = parse_input(input);
 
-    let overlapping_pairs = pairs
-        .iter()
-        .filter(|&pair| overlappying_pair(pair))
-        .count();
+    let overlapping_pairs = pairs.iter().filter(|&pair| overlappying_pair(pair)).count();
 
-    return overlapping_pairs.to_string();
+    overlapping_pairs.to_string()
 }
 
 #[cfg(test)]

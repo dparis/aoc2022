@@ -15,16 +15,16 @@ fn header_row<'a>() -> Row<'a> {
 }
 
 fn day_to_row<'a>(day: &mut Day) -> Row<'a> {
-    let solution_1 = day.part_1.solution().unwrap_or(String::from(""));
-    let solution_2 = day.part_2.solution().unwrap_or(String::from(""));
+    let solution_1 = day.part_1.solution().unwrap_or_else(|| String::from(""));
+    let solution_2 = day.part_2.solution().unwrap_or_else(|| String::from(""));
 
-    return Row::new(vec![day.label(), solution_1, solution_2, day.stars()]);
+    Row::new(vec![day.label(), solution_1, solution_2, day.stars()])
 }
 
 fn table_rows<'a>(app: &mut App) -> Vec<Row<'a>> {
     let days = &mut app.day_table.items;
 
-    return days.iter_mut().map(|d| day_to_row(d)).collect();
+    return days.iter_mut().map(day_to_row).collect();
 }
 
 fn draw_table<B: Backend>(f: &mut Frame<B>, app: &mut App) {

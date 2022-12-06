@@ -19,13 +19,13 @@ pub struct Problem {
 
 impl Problem {
     fn read_input(&self) -> Option<String> {
-        return fs::read_to_string(&self.path).ok();
+        fs::read_to_string(&self.path).ok()
     }
 
     pub fn solve(&self) {
         if let Some(solver) = self.solver {
             if let Some(input) = self.read_input() {
-                if let None = self.solution.get() {
+                if self.solution.get().is_none() {
                     self.solution
                         .set(solver(&input))
                         .expect("Tried to double-set solution");
@@ -55,7 +55,7 @@ pub struct Day {
 }
 
 fn input_path(advent_day: u8, input_part: u8) -> String {
-    return format!("./inputs/day_{}/input_{}.txt", advent_day, input_part);
+    format!("./inputs/day_{}/input_{}.txt", advent_day, input_part)
 }
 
 impl Day {
@@ -84,24 +84,24 @@ impl Day {
     }
 
     pub fn label(&self) -> String {
-        return format!("Day {} - {}", self.advent_day, self.title);
+        format!("Day {} - {}", self.advent_day, self.title)
     }
 
     pub fn url(&self) -> String {
-        return format!("https://adventofcode.com/2022/day/{}", self.advent_day);
+        format!("https://adventofcode.com/2022/day/{}", self.advent_day)
     }
 
     pub fn stars(&self) -> String {
-        return match self.correct {
+        match self.correct {
             Correct::None => String::from(""),
             Correct::PartOne => String::from("*"),
             Correct::Both => String::from("**"),
-        };
+        }
     }
 }
 
 pub fn init_days() -> Vec<Day> {
-    return vec![
+    vec![
         Day::new(
             1,
             String::from("Calorie Counting"),
@@ -151,5 +151,5 @@ pub fn init_days() -> Vec<Day> {
             Some(day_7::solve_2),
             Correct::None,
         ),
-    ];
+    ]
 }

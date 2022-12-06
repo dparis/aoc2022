@@ -23,25 +23,19 @@ fn find_marker_index(input: &str, marker_len: usize) -> Option<usize> {
         found.clear();
     }
 
-    return None;
+    None
 }
 
 pub fn solve_1(input: &str) -> String {
     let data = parse_input(input);
-    let packet_index = find_marker_index(&data, 4)
-        .map_or(String::from(""), |i| i.to_string());
-
-    return packet_index;
+    find_marker_index(&data, 4).map_or(String::from(""), |i| i.to_string())
 }
 
 // PART 2
 
 pub fn solve_2(input: &str) -> String {
     let data = parse_input(input);
-    let message_index = find_marker_index(&data, 14)
-        .map_or(String::from(""), |i| i.to_string());
-
-    return message_index;
+    find_marker_index(&data, 14).map_or(String::from(""), |i| i.to_string())
 }
 
 #[cfg(test)]
