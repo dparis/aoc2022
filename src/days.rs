@@ -38,6 +38,7 @@ impl Problem {
     }
 }
 
+#[allow(dead_code)]
 pub enum Correct {
     None,
     PartOne,
